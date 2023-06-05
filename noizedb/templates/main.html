@@ -1,0 +1,254 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% if measures %}
+<!-- <div  class="map" id = "map" style = "width: 90%; height:580px; margin-left: 4.5%; margin-bottom: 2%;"></div>
+      <script>
+        var MarkerIcon = L.Icon.extend({
+            options: {
+                customId: "",
+                iconSize: [38, 95],
+                iconAnchor: [22, 94],
+                popupAnchor: [-3, -76]
+            }
+        }) 
+
+        var red = new MarkerIcon({iconUrl: '{% static 'attach/loc-red.svg' %}'});
+            yel = new MarkerIcon({iconUrl: '{% static 'attach/loc-yel.svg' %}'});
+            blue = new MarkerIcon({iconUrl: '{% static 'attach/loc-bl.svg' %}'});
+            gr = new MarkerIcon({iconUrl: '{% static 'attach/loc-gr.svg' %}'});
+            pp = new MarkerIcon({iconUrl: '{% static 'attach/loc-pp.svg' %}'});
+
+         // Creating map options
+         var mapOptions = {
+            center: [59.9386, 30.3141],
+            zoom: 12
+         }
+         // Creating a map object
+         var map = new L.map('map', mapOptions);
+         
+         // Creating a Layer object
+         var layer = new L.TileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+    	attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+	    maxZoom: 16
+        });
+         
+         // Adding layer to the map
+         map.addLayer(layer);
+         
+         // Creating a marker
+        {% for coord in place_list %}
+          //  {% for measure in measures%}
+            //    if ({{measure.location.id}} == {{coord.id}})
+              //      var noize += {{measure.Nlevel}};
+                //    var count += 1;
+           // noize = noize/count;
+           // var color = Color(noize);
+           // alert(color)
+            var marker = L.marker([{{coord.lat}},{{coord.lon}}], {customId:{{coord.id}}, icon:blue}).addTo(map).bindPopup('{{coord.lat}},{{coord.lon}}').on('click', markerOnClick);
+        {% endfor %}
+        //{% endfor %}
+
+        function Color (noize) {
+            if (noize <= 40){
+                return 'gr';}
+            else if (noize >40 && noize <=50){
+                return 'yel';}
+            else if (noize >50 && noize <=60){
+                return 'blue';
+            }
+            else {
+                return 'red'
+            }
+        }
+
+        let form = document.forms.MeasureForm
+        let elem = form.elements.location
+        function markerOnClick(e) {
+            var customId = this.options.customId;
+            elem.value = customId
+        } 
+
+        function Show(btn) {
+            var cord = btn.value;
+            {% for coord in place_list%}
+                var coord = {{coord.id}}
+                if (cord == coord)
+                    var marker = L.marker([{{coord.lat}},{{coord.lon}}], {customId:{{coord.id}}, icon:pp}).addTo(map).bindPopup('{{coord.lat}},{{coord.lon}}').on('click', markerOnClick)
+                    var top = Math.max(document.body.scrollTop,document.documentElement.scrollTop);
+                    if(top > 0) {
+                        window.scrollBy(0,-100);
+                         timeOut = setTimeout('goUp()',20);
+                    } else clearTimeout(timeOut);
+            {% endfor %}  
+        } 
+         
+      </script> -->
+      <!-- <h2 style="color: rgb(137, 171, 171);text-align: left; margin-left: 4.5%;">Выберите участок для моделирования: </h2> -->
+        <div id='map' style='width: 90%; height:70vh; margin-left: 4.5%;'></div>
+        <form action="" method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="Submit" name="submit" value="Показать"></input>
+            </form>
+            
+        <script>
+            mapboxgl.accessToken = 'pk.eyJ1IjoibGVtb25oZWxsIiwiYSI6ImNrb3ZvYzZ3MzBhZXMybnI0bjJyZDV5aXEifQ.uQB1HFQbdpXQAY9RHbG2hQ';
+            var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/light-v9',
+            center: [30.3141, 59.9386],
+            zoom: 13,
+            antialias: true
+            });
+
+            map.addControl(new mapboxgl.NavigationControl());
+            map.addControl(new mapboxgl.FullscreenControl());
+            
+
+            map.on('load', () => {
+                var noisedata = '';
+                var submitbutton = '{{submitbutton|escapejs }}';
+                console.log(submitbutton)
+                if (submitbutton == "Submit") {
+                    noisedata = '{% static 'big.geojson' %}'
+                } 
+                else {
+                    noisedata = '{% static 'main.geojson' %}'
+                }
+                    
+                console.log(noisedata)
+                
+                map.addSource('noise', {
+                type: 'geojson',
+                // Use a URL for the value for the `data` property.
+                data: noisedata
+                });
+                
+                map.addLayer({
+                    'id': 'noise',
+                    'type': 'fill',
+                    'source': 'noise',
+                    'layout': {},
+                    'paint': {
+                        'fill-color': {
+                        property: 'value',
+                        stops: [
+                            [45, '#C8E59A'],
+                            [55, '#FEBE8E'],
+                            [65, '#EF4818']
+                        ]
+                        },
+                        'fill-opacity': 0.8
+                    }
+                }, 'add-3d-buildings');
+            });
+
+            map.on('style.load', () => {
+                // Insert the layer beneath any symbol layer.
+                const layers = map.getStyle().layers;
+                const labelLayerId = layers.find(
+                (layer) => layer.type === 'symbol' && layer.layout['text-field']
+                ).id;
+                
+                // The 'building' layer in the Mapbox Streets
+                // vector tileset contains building height data
+                // from OpenStreetMap.
+                map.addLayer(
+                {
+                'id': 'add-3d-buildings',
+                'source': 'composite',
+                'source-layer': 'building',
+                'filter': ['==', 'extrude', 'true'],
+                'type': 'fill-extrusion',
+                'minzoom': 15,
+                'paint': {
+                'fill-extrusion-color': '#aaa',
+                
+                // Use an 'interpolate' expression to
+                // add a smooth transition effect to
+                // the buildings as the user zooms in.
+                'fill-extrusion-height': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                15,
+                0,
+                15.05,
+                ['get', 'height']
+                ],
+                'fill-extrusion-base': [
+                'interpolate',
+                ['linear'],
+                ['zoom'],
+                15,
+                0,
+                15.05,
+                ['get', 'min_height']
+                ],
+                'fill-extrusion-opacity': 0.6
+                }
+                },
+                labelLayerId,
+                );
+            });
+
+            map.on('click', 'noise', (e) => {
+                new mapboxgl.Popup({closeButton:false})
+                .setLngLat(e.lngLat)
+                .setHTML(e.features[0].properties.value == "65"? "Уровень шума более 60 дБ": e.features[0].properties.value == "55"? "Уровень шума до 50 дБ": "Уровень шума менее 45 дБ")
+                .addClassName(e.features[0].properties.value == "65"? "red" : e.features[0].properties.value == "55"? "yellow" : "green")
+                .addTo(map);
+            });
+
+            // Change the cursor to a pointer when
+            // the mouse is over the states layer.
+            map.on('mouseenter', 'noise', () => {
+            map.getCanvas().style.cursor = 'pointer';
+            });
+            
+            // Change the cursor back to a pointer
+            // when it leaves the states layer.
+            map.on('mouseleave', 'noise', () => {
+            map.getCanvas().style.cursor = 'default';
+            });
+        </script>
+        
+<!-- <div class="d-flex justify-content-center">
+    <div class="log-btn" style="width: 200px; margin-bottom: 3%;">
+      <a href="{% url 'noizedb:Stats' %}">Оценочная статистика</a>
+    </div>
+  </div>
+<h2 style="color: rgb(42, 66, 66);text-align: center;">Статистика измерений</h2>
+<div class="table-responsive container-fluid" style="margin-top: 2%;">
+    <table class="table-hover">
+        <tbody>
+            <tr>
+                <th>Эквивалентный <br> уровень шума</th>
+                <th>Максимальный <br> уровень шума</th>
+                <th>Происхождение</th>
+                <th>Характер</th>
+                <th>Геолокация</th>
+                <th>Дата</th>
+                <th>Время</th>
+            </tr>
+            {% for measure in measures %}
+            <tr>
+                <td>{{ measure.Nlevel }} дБ</td>
+                <td>{{ measure.MNlevel }} дБ</td>
+                <td>{{ measure.From.FromParam }}</td>
+                <td>{{ measure.Chark.CharkParam }}</td>
+                <td>{{ measure.location }} <br> <button onclick="Show(this)" value="{{ measure.location.id }}">Показать на карте</button></td>
+                
+                <td>{{ measure.Date }}</td>
+                <td>{{ measure.Time }}</td>
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+</div>
+{% else %}
+<h2 style="text-align: center;">Данные об измерениях отсутствуют</h2>
+{% endif %} -->
+
+{% endblock content %}

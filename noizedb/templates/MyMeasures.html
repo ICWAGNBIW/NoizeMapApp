@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+{% if measures.count > 0 %}
+<div  class="map" id = "map" style = "width: 90%; height:580px; margin-left: 4.5%; margin-bottom: 2%;"></div>
+      <script>
+        var MarkerIcon = L.Icon.extend({
+            options: {
+                customId: "",
+                iconSize: [38, 95],
+                iconAnchor: [22, 94],
+                popupAnchor: [-3, -76]
+            }
+        }) 
+
+        var red = new MarkerIcon({iconUrl: '{% static 'attach/loc-red.svg' %}'});
+            yel = new MarkerIcon({iconUrl: '{% static 'attach/loc-yel.svg' %}'});
+            blue = new MarkerIcon({iconUrl: '{% static 'attach/loc-bl.svg' %}'});
+            gr = new MarkerIcon({iconUrl: '{% static 'attach/loc-gr.svg' %}'});
+            pp = new MarkerIcon({iconUrl: '{% static 'attach/loc-pp.svg' %}'});
+
+         // Creating map options
+         var mapOptions = {
+            center: [59.9386, 30.3141],
+            zoom: 12
+         }
+         // Creating a map object
+         var map = new L.map('map', mapOptions);
+         
+         // Creating a Layer object
+         var layer = new L.TileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+    	attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+	    maxZoom: 16
+        });
+         
+         // Adding layer to the map
+         map.addLayer(layer);
+         
+         // Creating a marker
+        {% for measure in measures %}
+            var marker = L.marker([{{measure.location.lat}},{{measure.location.lon}}], {customId:{{measure.location.id}}, icon:red}).addTo(map).bindPopup('{{measure.location.lat}},{{measure.location.lon}}').on('click', markerOnClick);
+        {% endfor %}
+
+        let form = document.forms.MeasureForm
+        let elem = form.elements.location
+        function markerOnClick(e) {
+            var customId = this.options.customId;
+            elem.value = customId
+        } 
+
+        function Show(btn) {
+            var cord = btn.value;
+            {% for coord in place_list%}
+                var coord = {{coord.id}}
+                if (cord == coord)
+                    var marker = L.marker([{{coord.lat}},{{coord.lon}}], {customId:{{coord.id}}, icon:pp}).addTo(map).bindPopup('{{coord.lat}},{{coord.lon}}').on('click', markerOnClick)
+                    var top = Math.max(document.body.scrollTop,document.documentElement.scrollTop);
+                    if(top > 0) {
+                        window.scrollBy(0,-100);
+                         timeOut = setTimeout('goUp()',20);
+                    } else clearTimeout(timeOut);
+            {% endfor %}  
+        } 
+         
+      </script>
+<h2>Мои измерения</h2>
+<div class="table-responsive container-fluid" style="margin-top: 2%;">
+    <table class="table-hover">
+        <tbody>
+            <tr>
+                <th>Эквивалентный <br> уровень шума</th>
+                <th>Максимальный <br> уровень шума</th>
+                <th>Происхождение</th>
+                <th>Характер</th>
+                <th>Геолокация</th>
+                <th>Дата</th>
+                <th>Время</th>
+                <!-- <th class="nobr" colspan="2">Редактировать</th> -->
+            </tr>
+            {% for measure in measures %}
+            <tr>
+                <td>{{ measure.Nlevel }} дБ</td>
+                <td>{{ measure.MNlevel }} дБ</td>
+                <td>{{ measure.From.FromParam }}</td>
+                <td>{{ measure.Chark.CharkParam }}</td>
+                <td>{{ measure.location }} <br><button onclick="Show(this)" value="{{ measure.location.id }}">Показать на карте</button></td>
+                <td>{{ measure.Date }}</td>
+                <td>{{ measure.Time }}</td>
+                <!-- <td class="nobr"><div class="d-flex justify-content-center"><div class="tbl-btn log-btn"><a href="Delete/{{measure.id}}">Удалить</a></div></div></td>
+                <td class="nobr"><div class="d-flex justify-content-center"><div class="tbl-btn log-btn"><a href="Edit/{{measure.id}}">Изменить</a></div></div></td> -->
+            </tr>
+        </tbody>
+        {% endfor %}
+    </table>
+</div>
+{% else %}
+<h2 style="text-align: center;">Данные измерений отсутствуют</h2>
+{% endif %}        
+{% endblock content %}

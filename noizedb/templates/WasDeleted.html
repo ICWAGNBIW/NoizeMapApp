@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 style="text-align: center;">Запись об измерении была успешно удалена!</h2>
+<div class="d-flex justify-content-center">
+    <div class="log-btn" style="width: 255px;">
+        <a href="{% url 'noizedb:MyMeasures' %}">Вернуться к списку измерений</a>
+    </div>
+</div>
+{% endblock content %}

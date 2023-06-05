@@ -1,0 +1,209 @@
+body {
+    background-color: #4f5252;
+    mix-blend-mode: normal;
+    font-family: 'system-ui';
+    font-style: normal;
+    font-weight: normal;
+    font-size: 24px;
+    color: #11B7C7;
+}
+
+.mapboxgl-popup {
+    max-width: 400px;
+    font: 16px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    color: #B5E0ED;
+    }
+
+.mapboxgl-popup .mapboxgl-popup-content {
+    background-color: #787878;
+}
+
+.red .mapboxgl-popup-content {
+    border-left: 5px solid #EF4818;
+}
+
+.yellow .mapboxgl-popup-content {
+    border-left: 5px solid #fadd5c;
+}
+
+.green .mapboxgl-popup-content {
+    border-left: 5px solid #b8f358;
+}
+
+.mapboxgl-popup-anchor-top .mapboxgl-popup-tip,
+.mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip,
+.mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip {
+    border-bottom-color: #787878 !important;
+    }
+.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip,
+.mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip,
+.mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip {
+    border-top-color: #787878 !important;
+    }
+.mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
+    border-right-color: #787878 !important;
+    }
+.mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
+    border-left-color: #787878 !important;
+    }
+
+/*NAV BAR*/
+
+.nav-bar {
+    margin-bottom: 2%;
+    background-color: #385a5a;
+}
+
+.logo {
+    margin-left: 1%;
+}
+
+.logo-name {
+    position: relative;
+
+    font-family: Red Hat Display;
+    font-style: normal;
+    font-weight: 500;
+    font-size: 70px;
+    line-height: 93px;
+    text-align: center;
+    font-feature-settings: 'kern' off;
+
+    color: #11B7C7;
+}
+
+
+/*BUTTONS*/
+
+.log-btn {position: relative;
+width: 85px;
+height: 30px;
+
+background: linear-gradient(180deg, #00E0C7 0%, #039CCA 98.75%);
+background-blend-mode: color-burn;
+mix-blend-mode: normal;
+border: 3px solid #2D6363;
+border-radius: 5px;
+color: #2D6363;
+font-size: 18px;
+}
+
+.ch {
+    width: 260px;
+}
+
+button {
+    padding: 0;
+    border: none;
+    font: inherit;
+    color: inherit;
+    background-color: transparent;
+}
+
+.log-btn a {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    color: #2D6363;
+    font-size: 18px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+
+/*MAP*/
+
+.map {
+    -webkit-filter: hue-rotate(180deg) invert(85%);
+}
+
+
+/*FORM*/
+
+.field {
+width: 55%;
+height: 50px;
+margin: 1%;
+
+background: #abc7c5;
+/*border: 2px solid #265555;*/
+border: none;
+box-sizing: border-box;
+border-radius: 4px;
+padding: 1%;
+}
+
+.field-name {
+    font-size: 28px;
+    color: #234141;
+    font-weight: bolder;
+}
+
+.second {
+    margin-top: 5%;
+}
+
+
+/*TABLES*/
+
+table {
+    background: #83a1a1;
+    border-radius: 5px;
+    width: 100%;
+}
+
+th, td {
+    padding: 0.6%;
+}
+
+th {
+    font-family: Inter;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 20px;
+    line-height: 22px;
+    text-align: center;
+
+
+    color: #22545f;
+}
+
+td {
+    font-family: Inter;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 18px;
+    line-height: 20px;
+    text-align: center;
+    border-top: 1px solid #22545f;
+
+    color: #000000;
+
+}
+
+table span {
+font-weight: bold;
+}
+
+td {
+    border-right:1px solid #22545f;
+}
+
+th {
+    border-right:1px solid #22545f;
+}
+
+.nobr {
+    border-right: none;
+}
+
+.tbl-btn {
+height: 27px;
+background: none;
+border: 2px solid #2D6363;
+box-sizing: border-box;
+border-radius: 5px;
+}
+
+.tbl-btn a {    
+color: #2D6363;
+}
