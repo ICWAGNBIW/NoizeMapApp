@@ -85,20 +85,55 @@
          
       </script> -->
       <!-- <h2 style="color: rgb(137, 171, 171);text-align: left; margin-left: 4.5%;">Выберите участок для моделирования: </h2> -->
-        <div id='map' style='width: 90%; height:70vh; margin-left: 4.5%;'></div>
-        <form action="" method="POST">
+        
+      <style>
+
+        #try li{
+        display:block; }
+
+    </style>
+     <div id="console">
+        <h1 class="legend-title">Уровень шума в дБ</h1>
+        <p class="legend-text" style="Margin-left: 10px">
+            Цветом на карте отображается уровень акустического шума в каждой точке измерения.
+        </p>
+        <div class="row d-flex justify-content-between" style="margin-left: 10px; margin-right: 10px;">
+            <div class="legend-cube" style="background-color: #311664;"></div>
+            <div class="legend-cube" style="background-color: #905BF2;"></div>
+            <div class="legend-cube" style="background-color: #6B8AF0;"></div>
+            <div class="legend-cube" style="background-color: #6BE7F0;"></div>
+            <div class="legend-cube" style="background-color: #B2F06B;"></div>
+            <div class="legend-cube" style="background-color: #F0DA6B;"></div>
+            <div class="legend-cube" style="background-color: #F0A06B;"></div>
+            <div class="legend-cube" style="background-color: #F06B6B;"></div>
+        </div>
+        <div class="row d-flex" style="margin-left: 10px; margin-right: 10px; margin-top: 10px;">
+                <div class="col-6">
+                    <p class="legend-text"> Тихо </p>
+                </div>
+                <div class="col-6">
+                    <p class="legend-text" style="text-align: right;"> Громко </p>
+                </div>
+        </div>
+      </div>
+      <div id='map'>
+       
+      </div>
+
+        <!-- <div class="container">
+            <form id="try" action="" method="POST">
             {% csrf_token %}
             {{ form.as_p }}
             <input type="Submit" name="submit" value="Показать"></input>
             </form>
-            
+        </div> -->
         <script>
-            mapboxgl.accessToken = 'pk.eyJ1IjoibGVtb25oZWxsIiwiYSI6ImNrb3ZvYzZ3MzBhZXMybnI0bjJyZDV5aXEifQ.uQB1HFQbdpXQAY9RHbG2hQ';
+            mapboxgl.accessToken = 'pk.eyJ1IjoibWFnaWRlbGVuYSIsImEiOiJjbHVtZjc2dHgwYWMyMmlwbm52aHR2ZGpnIn0.qdkq_oCvkXoxgX4WVBMCuA';
             var map = new mapboxgl.Map({
             container: 'map',
             style: 'mapbox://styles/mapbox/light-v9',
-            center: [30.3141, 59.9386],
-            zoom: 13,
+            center: [30.3841, 59.9386],
+            zoom: 12,
             antialias: true
             });
 
@@ -107,15 +142,22 @@
             
 
             map.on('load', () => {
-                var noisedata = '';
-                var submitbutton = '{{submitbutton|escapejs }}';
-                console.log(submitbutton)
-                if (submitbutton == "Submit") {
-                    noisedata = '{% static 'big.geojson' %}'
-                } 
-                else {
-                    noisedata = '{% static 'main.geojson' %}'
-                }
+                var noisedata = '{% static 'measures.geojson' %}';
+                // var submitbutton = '{{submitbutton|escapejs }}';
+                // var source = '{{source|escapejs }}';
+                // console.log(submitbutton)
+                // if (submitbutton == "Показать") {
+                //     if (source == 2) {
+                //         noisedata = '{% static 'transport.geojson' %}';
+                //     } else if (source == 3 || source == 4) {
+                //         noisedata = '{% static 'industrial.geojson' %}';
+                //     } else {
+                //         noisedata = '{% static 'other.geojson' %}'
+                //     }
+                // } 
+                // else {
+                //     noisedata = '{% static 'measures.json' %}'
+                // }
                     
                 console.log(noisedata)
                 
@@ -127,20 +169,22 @@
                 
                 map.addLayer({
                     'id': 'noise',
-                    'type': 'fill',
+                    'type': 'circle',
                     'source': 'noise',
                     'layout': {},
-                    'paint': {
-                        'fill-color': {
-                        property: 'value',
-                        stops: [
-                            [45, '#C8E59A'],
-                            [55, '#FEBE8E'],
-                            [65, '#EF4818']
-                        ]
-                        },
-                        'fill-opacity': 0.8
-                    }
+                    paint: {
+                        'circle-color': [
+                        'step', 
+                        ["get", "value"],  
+                        "#311664", 
+                        50, "#905BF2",
+                        55, "#6B8AF0",
+                        60, "#6BE7F0",
+                        65, "#B2F06B",
+                        70, "#F0DA6B",
+                        75, "#F0A06B",
+                        80, "#F06B6B"]
+                        }
                 }, 'add-3d-buildings');
             });
 
@@ -196,8 +240,8 @@
             map.on('click', 'noise', (e) => {
                 new mapboxgl.Popup({closeButton:false})
                 .setLngLat(e.lngLat)
-                .setHTML(e.features[0].properties.value == "65"? "Уровень шума более 60 дБ": e.features[0].properties.value == "55"? "Уровень шума до 50 дБ": "Уровень шума менее 45 дБ")
-                .addClassName(e.features[0].properties.value == "65"? "red" : e.features[0].properties.value == "55"? "yellow" : "green")
+                .setHTML( "Уровень шума: " + e.features[0].properties.value + " дБ")
+                .addClassName(e.features[0].properties.value > "65"? "red" : e.features[0].properties.value > "55"? "yellow" : "green")
                 .addTo(map);
             });
 

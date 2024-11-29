@@ -38,12 +38,15 @@ def getColor(noize):
         return 'blue'
     else:
         return 'red'
+    
 def Form(request):
     form = MeasurmentForm()
     place_list = Coordinates.objects.order_by('id')
+    measures = Measurement.objects.all()
     context = {
         'form' : form,
         'place_list' : place_list,
+        'measures': measures,
     }
     return render(request, 'form.html',context=context)
 

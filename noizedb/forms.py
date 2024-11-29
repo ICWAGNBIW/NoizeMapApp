@@ -19,6 +19,8 @@ class NoiseSourcesForm(forms.Form):
     ]
     source = forms.ChoiceField(
         label = "Тип источников шума",
-        widget=forms.RadioSelect,
+        widget=forms.RadioSelect(attrs={
+            'display': 'inline-block',
+        }),
         choices=CHOICES, 
     )
